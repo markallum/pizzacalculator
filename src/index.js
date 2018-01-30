@@ -9,15 +9,13 @@ class NumberInput extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.handleChange = this.handleChange.bind(this);
+
 
 		//this.state = {inputValue: 0};
 	}
 
 
-	handleChange(e) {
-		this.setState({inputValue: e.target.value});
-	}
+	
 
 	
 
@@ -27,7 +25,7 @@ class NumberInput extends React.Component {
 				<div className="calculator-input-box">
 
 					<input type="number" class="calculator-txtbox number-box"
-					data-type={this.props.type} min="0" onChange={this.handleChange} value={this.props.inputValue} step={this.props.step} />
+					data-type={this.props.type} min="0" onChange={(e) => this.props.onChange(e, this.props.type)} value={this.props.inputValue} step={this.props.step} />
 				</div>
 				
 				<div class="calculator-button-box">
@@ -69,6 +67,15 @@ class InputGroup extends React.Component {
 		this.setState({[stateKey]: newValue.toFixed(2)});
 	}
 
+	handleChange(e, type) {
+		let stateKey = `${type}Value`;
+		let newValue = parseFloat(e.target.value);
+		if (newValue < 0) {
+			newValue= 0;
+		}
+		this.setState({[stateKey]: newValue});
+	}
+
 	render() {
 
 
@@ -86,6 +93,7 @@ class InputGroup extends React.Component {
 								type="price"
 								step="0.01"
 								changeValue={this.changeValue.bind(this)}
+								onChange={this.handleChange.bind(this)}
 								inputValue={this.state.priceValue}
 								 />
 								
@@ -108,6 +116,7 @@ class InputGroup extends React.Component {
 								type="quantity"
 								step="1"
 								changeValue={this.changeValue.bind(this)}
+								onChange={this.handleChange.bind(this)}
 								inputValue={this.state.quantityValue}
 								 />
 							</div>
@@ -129,6 +138,7 @@ class InputGroup extends React.Component {
 								type="size"
 								step="0.1"
 								changeValue={this.changeValue.bind(this)}
+								onChange={this.handleChange.bind(this)}
 								inputValue={this.state.sizeValue}
 								 />
 							</div>
