@@ -6,21 +6,20 @@ import './style.css';
 
 class NumberInput extends React.Component {
 
+	constructor(props) {
+		super(props);
+
+		this.handleChange = this.handleChange.bind(this);
+
+		//this.state = {inputValue: 0};
+	}
 
 
 	handleChange(e) {
 		this.setState({inputValue: e.target.value});
 	}
 
-	changeValue(amount) {
-		let oldValue = parseFloat(this.state.inputValue);
-		let newValue = oldValue + amount;
-
-		if (newValue < 0) {
-			newValue = 0;
-		}
-		this.setState({inputValue: newValue.toFixed(2)});
-	}
+	
 
 	render() {
 		return ( 	
@@ -28,12 +27,12 @@ class NumberInput extends React.Component {
 				<div className="calculator-input-box">
 
 					<input type="number" class="calculator-txtbox number-box"
-					data-type={this.props.type} min="0" onChange={this.handleChange} value={this.state.inputValue} step={this.props.step} />
+					data-type={this.props.type} min="0" onChange={this.handleChange} value={this.props.inputValue} step={this.props.step} />
 				</div>
 				
 				<div class="calculator-button-box">
-					<input type="button" class="calculator-number-button-add" value="+" onClick={() => this.changeValue(1)}  />
-					<input type="button" class="calculator-number-button-subtract" value="-" onClick={() => this.changeValue(-1)} />
+					<input type="button" class="calculator-number-button-add" value="+" onClick={() => this.props.changeValue(1, this.props.type)}  />
+					<input type="button" class="calculator-number-button-subtract" value="-" onClick={() => this.props.changeValue(-1, this.props.type)} />
 				</div>
 			</div>
 		);
@@ -46,7 +45,29 @@ class NumberInput extends React.Component {
 
 class InputGroup extends React.Component {
 
+	constructor(props) {
+		super(props);
 
+		this.state = {
+			priceValue: 0,
+			quantityValue: 0,
+			sizeValue: 0
+		};
+
+		
+	}
+
+	changeValue(amount, type) {
+		let stateKey = `${type}Value`;
+
+		let oldValue = parseFloat(this.state[stateKey]);
+		let newValue = oldValue + amount;
+
+		if (newValue < 0) {
+			newValue = 0;
+		}
+		this.setState({[stateKey]: newValue.toFixed(2)});
+	}
 
 	render() {
 
@@ -64,7 +85,11 @@ class InputGroup extends React.Component {
 								<NumberInput
 								type="price"
 								step="0.01"
+								changeValue={this.changeValue.bind(this)}
+								inputValue={this.state.priceValue}
 								 />
+								
+								
 							</div>
 
 						</div>
@@ -82,6 +107,8 @@ class InputGroup extends React.Component {
 								<NumberInput
 								type="quantity"
 								step="1"
+								changeValue={this.changeValue.bind(this)}
+								inputValue={this.state.quantityValue}
 								 />
 							</div>
 
@@ -101,6 +128,8 @@ class InputGroup extends React.Component {
 								<NumberInput
 								type="size"
 								step="0.1"
+								changeValue={this.changeValue.bind(this)}
+								inputValue={this.state.sizeValue}
 								 />
 							</div>
 
