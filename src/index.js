@@ -43,38 +43,7 @@ class NumberInput extends React.Component {
 
 class InputGroup extends React.Component {
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			priceValue: 0,
-			quantityValue: 0,
-			sizeValue: 0
-		};
-
-		
-	}
-
-	changeValue(amount, type) {
-		let stateKey = `${type}Value`;
-
-		let oldValue = parseFloat(this.state[stateKey]);
-		let newValue = oldValue + amount;
-
-		if (newValue < 0) {
-			newValue = 0;
-		}
-		this.setState({[stateKey]: newValue.toFixed(2)});
-	}
-
-	handleChange(e, type) {
-		let stateKey = `${type}Value`;
-		let newValue = parseFloat(e.target.value);
-		if (newValue < 0) {
-			newValue= 0;
-		}
-		this.setState({[stateKey]: newValue});
-	}
+	
 
 	render() {
 
@@ -92,9 +61,9 @@ class InputGroup extends React.Component {
 								<NumberInput
 								type="price"
 								step="0.01"
-								changeValue={this.changeValue.bind(this)}
-								onChange={this.handleChange.bind(this)}
-								inputValue={this.state.priceValue}
+								changeValue={this.props.changeValue.bind(this)}
+								onChange={this.props.handleChange.bind(this)}
+								inputValue={this.props.priceValue}
 								 />
 								
 								
@@ -115,9 +84,9 @@ class InputGroup extends React.Component {
 								<NumberInput
 								type="quantity"
 								step="1"
-								changeValue={this.changeValue.bind(this)}
-								onChange={this.handleChange.bind(this)}
-								inputValue={this.state.quantityValue}
+								changeValue={this.props.changeValue.bind(this)}
+								onChange={this.props.handleChange.bind(this)}
+								inputValue={this.props.quantityValue}
 								 />
 							</div>
 
@@ -137,9 +106,9 @@ class InputGroup extends React.Component {
 								<NumberInput
 								type="size"
 								step="0.1"
-								changeValue={this.changeValue.bind(this)}
-								onChange={this.handleChange.bind(this)}
-								inputValue={this.state.sizeValue}
+								changeValue={this.props.changeValue.bind(this)}
+								onChange={this.props.handleChange.bind(this)}
+								inputValue={this.props.sizeValue}
 								 />
 							</div>
 
@@ -152,26 +121,93 @@ class InputGroup extends React.Component {
 }
 
 class Calculator extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			priceValue: 0,
+			quantityValue: 0,
+			sizeValue: 0,
+			inchesAllPizza: 0,
+			pricePerInch: 0,
+		};
+
+		
+	}
+
+	calculateResults() {
+		let resultRadiusPerPizza = this.state.sizeValue / 2;
+		let resultAreaPerPizza = (resultRadiusPerPizza * resultRadiusPerPizza) * Math.PI;
+
+
+		let resultAreaAllPizza = resultAreaPerPizza * this.state.quantityValue;
+		let resultPricePerInch = this.state.priceValue / resultAreaAllPizza;
+
+		this.setState({
+			inchesAllPizza:resultAreaAllPizza.toFixed(0),
+			pricePerInch:resultPricePerInch.toFixed(2)
+		});
+	}
+
+	changeValue(amount, type) {
+		let stateKey = `${type}Value`;
+
+		let oldValue = parseFloat(this.state[stateKey]);
+		let newValue = oldValue + amount;
+
+		if (newValue < 0) {
+			newValue = 0;
+		}
+		this.setState({[stateKey]: newValue.toFixed(2)});
+
+	}
+
+	handleChange(e, type) {
+		let stateKey = `${type}Value`;
+		let newValue = parseFloat(e.target.value);
+		if (newValue < 0) {
+			newValue= 0;
+		}
+		this.setState({[stateKey]: newValue});
+
+	}
+
+	
+
 	render() {
 		return (
 			<div>
 				
 
 				<div>
-					<InputGroup />
+					<InputGroup
+					changeValue={this.changeValue.bind(this)}
+					handleChange={this.handleChange.bind(this)}
+					priceValue={this.state.priceValue}
+					quantityValue={this.state.quantityValue}
+					sizeValue={this.state.sizeValue}
+					 />
+					
 				</div>
 				
 
 				<div class="results-row">
-					<span class="results-section"><b>0</b> in<sup>2</sup> of pizza</span>
-					<b>0.00</b> per in<sup>2</sup>
+					<span class="results-section"><b>{this.state.inchesAllPizza}</b> in<sup>2</sup> of pizza</span>
+					<b>{this.state.pricePerInch}</b> per in<sup>2</sup>
 				</div>
 
 				<div class="line-spacer"></div>
 
-				<p>
-					<input type="button" value="Add new set" class="standard-button" />
-				</p>
+				<div class="cf">
+					<div class="left">
+						<input type="button" value="Calculate" class="standard-button" onClick={() => this.calculateResults()} />
+					</div>
+					<div class="right">
+						<input type="button" value="Add new set" class="standard-button" />
+					</div>
+				</div>
+	
 			</div>
 		);
 	}

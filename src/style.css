@@ -404,6 +404,12 @@ html {
   display: table;
   clear: both; }
 
+.left {
+  float: left; }
+
+.right {
+  float: right; }
+
 .page-wrapper {
   width: 100%; }
   @media (min-width: 901px) {
