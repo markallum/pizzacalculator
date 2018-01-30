@@ -6,12 +6,6 @@ import './style.css';
 
 class NumberInput extends React.Component {
 
-	constructor(props) {
-		super(props);
-
-		this.handleChange = this.handleChange.bind(this);
-		this.state = {inputValue: 0};
-	}
 
 
 	handleChange(e) {
@@ -52,7 +46,7 @@ class NumberInput extends React.Component {
 
 class InputGroup extends React.Component {
 
-	
+
 
 	render() {
 
