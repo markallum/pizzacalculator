@@ -496,6 +496,18 @@ html {
   border-bottom: 3px dashed #F2CA46;
   background: #F7F4ED; }
 
+.best-value-sticker {
+  text-transform: uppercase;
+  background: #451A15;
+  padding: 10px;
+  color: #F2CA46;
+  display: block;
+  width: 150px;
+  text-align: center;
+  font-weight: 600;
+  border-radius: 15px;
+  margin: 0 auto; }
+
 h1 {
   color: #D41E11;
   margin: 10px 0;

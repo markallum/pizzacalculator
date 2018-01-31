@@ -17,7 +17,7 @@ class NumberInput extends React.Component {
 				<div className="calculator-input-box">
 
 					<input type="number" class="calculator-txtbox number-box"
-					data-type={this.props.type} min="0" onChange={(e) => this.props.onChange(e, this.props.type)} value={this.props.inputValue} step={this.props.step} />
+					data-type={this.props.type} min="0" onChange={(e) => this.props.onChange(e, this.props.type, this.props.calcKey)} value={this.props.inputValue} step={this.props.step} />
 				</div>
 				
 				<div class="calculator-button-box">
@@ -124,7 +124,14 @@ class Calculator extends React.Component {
 		
 	}
 
-	
+	showBestValueSticker() {
+		if (this.props.valueMessage == 1) {
+			return (
+				<div className="best-value-sticker">Best Value</div>
+			);
+		}
+		
+	}
 
 	
 
@@ -157,6 +164,10 @@ class Calculator extends React.Component {
 					{this.props.errorMessage}
 				</div>
 
+				<div>
+					{this.showBestValueSticker()}
+				</div>
+
 				<div class="line-spacer"></div>
 
 				
@@ -184,10 +195,10 @@ class Page extends React.Component {
 	}
 
 	changeValue(amount, type, calcKey) {
-		let stateKey = `${type}Value`;
-		var stateCopy = [...this.state.calculators];
+		let propertyName = `${type}Value`;
+		var calculatorCopy = [...this.state.calculators];
 
-		let oldValue = parseFloat(stateCopy[calcKey][stateKey]);
+		let oldValue = parseFloat(calculatorCopy[calcKey][propertyName]);
 		let newValue = oldValue + amount;
 
 		if (newValue < 0) {
@@ -195,51 +206,64 @@ class Page extends React.Component {
 		}
 
 		
-		stateCopy[calcKey][stateKey] = newValue;
-		this.setState({calculators:stateCopy});
-
-		//var newCalculators = this.state.calculators.slice();
-		//var newCalculator = newCalculators[0];
-		//newCalculator.priceValue = newValue;
-		//newCalculators.push(newCalculator);
-		//this.setState({calculators:newCalculators})
-
-		//this.setState({calculators[0].priceValue: newValue.toFixed(2)});
+		calculatorCopy[calcKey][propertyName] = newValue;
+		this.setState({calculators:calculatorCopy});
 
 	}
 
-	handleChange(e, type) {
-		let stateKey = `${type}Value`;
+	handleChange(e, type, calcKey) {
+		let propertyName = `${type}Value`;
+		var calculatorCopy = [...this.state.calculators];
+
 		let newValue = parseFloat(e.target.value);
 		if (newValue < 0) {
 			newValue= 0;
 		}
-		this.setState({[stateKey]: newValue});
+
+		calculatorCopy[calcKey][propertyName] = newValue;
+		this.setState({calculators:calculatorCopy});
 
 	}
 
 	calculateResults() {
-		let resultRadiusPerPizza = this.state.sizeValue / 2;
-		let resultAreaPerPizza = (resultRadiusPerPizza * resultRadiusPerPizza) * Math.PI;
+		var calculatorCopy = [...this.state.calculators];
+		var bestValueAmount = 0;
+		var bestValueKey = 0;
+
+		for (var i = 0, l = calculatorCopy.length; i < l; i++) {
+			let resultRadiusPerPizza = calculatorCopy[i].sizeValue / 2;
+			let resultAreaPerPizza = (resultRadiusPerPizza * resultRadiusPerPizza) * Math.PI;
 
 
-		let resultAreaAllPizza = resultAreaPerPizza * this.state.quantityValue;
-		let resultPricePerInch = this.state.priceValue / resultAreaAllPizza;
+			let resultAreaAllPizza = resultAreaPerPizza * calculatorCopy[i].quantityValue;
+			let resultPricePerInch = calculatorCopy[i].priceValue / resultAreaAllPizza;
 
-		if (isFinite(resultAreaAllPizza) && isFinite(resultPricePerInch))  {
-			this.setState({
-				inchesAllPizza:resultAreaAllPizza.toFixed(0),
-				pricePerInch:resultPricePerInch.toFixed(2),
-				errorMessage:""
-			});
-		} else {
-			this.setState({
-				inchesAllPizza:0,
-				pricePerInch:0.00,
-				errorMessage:"Something went wrong..."
-			});
+			if (isFinite(resultAreaAllPizza) && isFinite(resultPricePerInch))  {
+				calculatorCopy[i].inchesAllPizza = resultAreaAllPizza.toFixed(0);
+				calculatorCopy[i].pricePerInch = resultPricePerInch.toFixed(2);
+				calculatorCopy[i].errorMessage = "";
+
+				if (calculatorCopy[i].pricePerInch <= bestValueAmount || bestValueAmount == 0) {
+
+					bestValueAmount = calculatorCopy[i].pricePerInch;
+					bestValueKey = i;
+				}
+
+				this.setState({calculators:calculatorCopy});
+			} else {
+
+				calculatorCopy[i].inchesAllPizza = 0
+				calculatorCopy[i].pricePerInch = 0.00
+				calculatorCopy[i].errorMessage = "";
+				
+				this.setState({calculators:calculatorCopy});
+			}
+
+			calculatorCopy[i].valueMessage = 0;
 		}
-		
+
+		calculatorCopy[bestValueKey].valueMessage = 1;
+
 	}
 
 	createNewCalculator() {
@@ -248,7 +272,8 @@ class Page extends React.Component {
 			quantityValue:0,
 			priceValue:0,
 			inchesAllPizza:0,
-			pricePerInch:0
+			pricePerInch:0,
+			valueMessage:0
 		};
 
 		var newCalculators = this.state.calculators.slice();
@@ -256,9 +281,7 @@ class Page extends React.Component {
 		this.setState({calculators:newCalculators})
 	}
 
-	componentDidMount() {
-
-	}
+	
 
 	renderCalculators() {
 		return (
@@ -273,6 +296,7 @@ class Page extends React.Component {
 					inchesAllPizza={item.inchesAllPizza}
 					pricePerInch={item.pricePerInch}
 					errorMessage={item.errorMessage}
+					valueMessage={item.valueMessage}
 				/>
 			)
 		);
@@ -303,7 +327,7 @@ class Page extends React.Component {
 
 				</main>
 				<footer class="footer-wrapper">
-					<p>Pizzacalculator was created by Mark Allum, a web developer with a passion for the web and good value pizza. You can find out more about my projects and my work here.</p>
+					<p>Pizzacalculator was created by Mark Allum, a developer with a passion for the web and good value pizza. You can find out more about my projects and my work here.</p>
 				</footer>
 			</div>
 
