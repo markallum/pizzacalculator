@@ -6,14 +6,6 @@ import './style.css';
 
 class NumberInput extends React.Component {
 
-	constructor(props) {
-		super(props);
-
-
-
-		//this.state = {inputValue: 0};
-	}
-
 
 	
 
@@ -131,6 +123,7 @@ class Calculator extends React.Component {
 			sizeValue: 0,
 			inchesAllPizza: 0,
 			pricePerInch: 0,
+			errorMessage: ""
 		};
 
 		
@@ -144,10 +137,20 @@ class Calculator extends React.Component {
 		let resultAreaAllPizza = resultAreaPerPizza * this.state.quantityValue;
 		let resultPricePerInch = this.state.priceValue / resultAreaAllPizza;
 
-		this.setState({
-			inchesAllPizza:resultAreaAllPizza.toFixed(0),
-			pricePerInch:resultPricePerInch.toFixed(2)
-		});
+		if (isFinite(resultAreaAllPizza) && isFinite(resultPricePerInch))  {
+			this.setState({
+				inchesAllPizza:resultAreaAllPizza.toFixed(0),
+				pricePerInch:resultPricePerInch.toFixed(2),
+				errorMessage:""
+			});
+		} else {
+			this.setState({
+				inchesAllPizza:0,
+				pricePerInch:0.00,
+				errorMessage:"Something went wrong..."
+			});
+		}
+		
 	}
 
 	changeValue(amount, type) {
@@ -194,7 +197,11 @@ class Calculator extends React.Component {
 
 				<div class="results-row">
 					<span class="results-section"><b>{this.state.inchesAllPizza}</b> in<sup>2</sup> of pizza</span>
-					<b>{this.state.pricePerInch}</b> per in<sup>2</sup>
+					£<b>{this.state.pricePerInch}</b> per in<sup>2</sup>
+				</div>
+
+				<div>
+					{this.state.errorMessage}
 				</div>
 
 				<div class="line-spacer"></div>
@@ -215,13 +222,21 @@ class Calculator extends React.Component {
 
 
 class Page extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.state = {
+			calculators: []
+		};
+	}
+
 	render() {
 		return (
 			<div class="page-wrapper">
-				<div class="title-wrapper">
+				<header class="title-wrapper">
 					<h1>pizzacalculator</h1>
-				</div>
-				<div class="content-wrapper">
+				</header>
+				<main class="content-wrapper">
 					<h2>Pizza should be easy</h2>
 					<p>Calculate how much pizza you are getting for your money and compare deals, because math is hard.</p>
 
@@ -229,10 +244,10 @@ class Page extends React.Component {
 
 					<Calculator />
 
-				</div>
-				<div class="footer-wrapper">
+				</main>
+				<footer class="footer-wrapper">
 					<p>Pizzacalculator was created by Mark Allum, a web developer with a passion for the web and good value pizza. You can find out more about my projects and my work here.</p>
-				</div>
+				</footer>
 			</div>
 
 
